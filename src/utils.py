@@ -50,7 +50,10 @@ def path_and_period(path_to_file: str, period_time: list) -> DataFrame:
 def get_card_with_spend(sorted_df: DataFrame)-> list[dict]:
     card_spent_transaction = []
     card_sorted = sorted_df [[
-
+        "Номер карты",
+        "Сумма операции",
+        "Сумма операции с округлением",
+        "Кэшбэк"
     ]]
     for index, row in card_sorted.iterrows():
         if row["Сумма операции"] <=0:

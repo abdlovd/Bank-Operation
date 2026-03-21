@@ -1,6 +1,7 @@
 import json
 
 from config import JSON, EXCEL
+from main import open_json_file
 from src.utils import get_time_for_greeting, get_date, path_and_period, get_card_with_spend, get_top_transaction, \
     get_currency, get_stock
 
@@ -23,11 +24,14 @@ def main_info(date_time:str)-> str:
     #3. Топ 5 транзакции по сумме платежа
     top_transaction = get_top_transaction(sorted_df, 5)
 
+    #4. Открытие файла
+    symbols, stocks = open_json_file(JSON)
+
     #4. Курс Валют
-    currency_rates = get_currency(JSON)
+    currency_rates = get_currency(symbols)
 
     #5. Стоимость акций из S&P500.
-    stock_prices = get_stock(JSON)
+    stock_prices = get_stock(stocks)
 
     data = {
         "greeting": greeting,

@@ -4,7 +4,9 @@ from unittest.mock import patch
 from freezegun import freeze_time
 from pandas import Timestamp
 
-from src.utils import get_time_for_greeting, get_date, path_and_period, get_card_with_spend, get_top_transaction
+
+from src.utils import get_time_for_greeting, get_date, path_and_period, get_card_with_spend, get_top_transaction, \
+    get_currency, get_stock
 
 
 @freeze_time("2026-03-12 13:00:00")
@@ -64,8 +66,20 @@ def test_get_top_transaction(sample_2, numbers):
                                 'description': 'Магнит'}]
 
 def test_get_currency():
-    pass
+    with patch("requests.get") as mock_get:
+        mock_get.return_value.json.return_value = {"rates": {"USD": 0.11}}
+        result = get_currency("USD")
+        assert result == [{'currency': 'USD', 'rate': 9.09}]
 
-
-
-
+def test_get_stock():
+    """{'Global Quote': {'01. symbol': 'AAPL', '02. open': '252.1050',
+    '03. high': '253.8850', '04. low': '249.8800', '05. price': '252.8200',
+    '06. volume': '32074209', '07. latest trading day': '2026-03-16',
+    '08. previous close': '250.1200', '09. change': '2.7000', '10. change percent': '1.0795%'}}
+"""
+    with patch("requests.get") as mock_get:
+        mock_get.return_value.json.return_value = {'Global Quote': {'01. symbol': "AAPL", '05. price': '100.00'}}
+        mock_get.return_value.status_code = 200
+        assert get_stock(["AAPL"])== [{'price': 100.0, 'stock': 'AAPL'}]
+        mock_get.return_value.status_code = 400
+        assert get_stock(["AAPL"])== []

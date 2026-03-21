@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-url = "https://api.apilayer.com/exchangerates_data/convert"
+
 url_stock = "https://www.alphavantage.co/query"
 
 
@@ -104,48 +104,27 @@ def get_top_transaction(sorted_df: DataFrame, get_top):
         top_pay_transaction.append(transaction)
     return top_pay_transaction
 
-
-def get_currency(path_to_json: str) -> list[dict]:
-    """ Функция принимает на вход path_to_json и возвращает курс валют """
-
-    currency_rates = []
-    with open(path_to_json, "r", encoding="utf-8") as f:
-        data = json.load(f)
-        currencies = data["user_currencies"]
-
-        for currency in currencies:
-            params = {
-                "amount": 1,
-                "from": f"{currency}",
-                "to": "RUB"
-            }
-
-            headers = {"apikey": os.getenv("API_KEY")}
-            response = requests.get(url, headers=headers, data=params)
-            status_code = response.status_code
-            if status_code == 200:
-                result = response.json()
-                currency_code = result["query"]["from"]
-                currency_amount = round(result["result"], 2)
-                currency_rates.append({
-                    "currency": f"{currency_code}",
-                    "rate": f"{currency_amount}"
-                })
-        return currency_rates
+def get_currency(symbols):
+    base = "RUB"
+    url = f"https://api.apilayer.com/exchangerates_data/latest?symbols={symbols}&base={base}"
+    headers = {"apikey": os.getenv("API_KEY")}
+    response = requests.get(url, headers=headers, data={})
+    result_cur = []
+    for k, v in response.json().get("rates").items():
+        result_cur.append({"currency": k, "rate": round(1/v, 2)})
+    return result_cur
 
 
-def get_stock(path_to_json: str) -> list[dict]:
+
+
+def get_stock(stocks: list) -> list[dict]:
     stock_rates = []
-    with open(path_to_json, "r", encoding="utf-8") as f:
-        data = json.load(f)
-        stocks = data["user_stocks"]
-
     for stock in stocks:
         params = {
-            "symbols": f"{stock}"
+            "symbol": f"{stock}",  "apikey": os.getenv("API_KEY_ALPHA_VINTAGE"), "function": "GLOBAL_QUOTE"
         }
-        headers = {"apikey": os.getenv("API_KEY_ALPHA_VINTAGE")}
-        r = requests.get(url_stock, headers=headers, data=params)
+
+        r = requests.get(url_stock, data={}, params=params)
         status_code = r.status_code
         if status_code == 200:
             result = r.json()

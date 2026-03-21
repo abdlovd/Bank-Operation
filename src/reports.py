@@ -3,6 +3,8 @@ from typing import Optional
 import pandas as pd
 
 def file_wrapper(arg: str="report.log"):
+    """декоратор для функций-отчетов, который записывает в файл результат,
+    который возвращает функция, формирующая отчет."""
     def my_decorator(func):
         def wrapper(*args, **kwargs):
             result: pd.DataFrame = func(*args, **kwargs)
@@ -38,3 +40,4 @@ def spending_by_category(transactions: pd.DataFrame,
         (transactions["Дата операции"] <= end_date)
     ]
     return filtered_data
+

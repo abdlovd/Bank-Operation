@@ -2,18 +2,15 @@ import pandas as pd
 import json
 
 
-def analyse_cashback(file_path: str, year: int, month: int)-> str:
+def analyse_cashback(df: pd.DataFrame, year: int, month: int)-> str:
     """ функцию для анализа выгодности категорий повышенного кешбэка,
     выводит JSON с анализом, сколько на каждой категории можно заработать кешбэка
     """
-    df = pd.read_excel(file_path)
     df["Дата операции"] = pd.to_datetime(df["Дата операции"], format="%d.%m.%Y %H:%M:%S")
     filtered_data: pd.DataFrame = df[
         (df["Дата операции"].dt.year == year)
         &
         (df["Дата операции"].dt.month == month)
-        &
-        (df["Кэшбэк"] > 0)
         &
         (df["Сумма платежа"] < 0)
     ]

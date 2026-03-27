@@ -2,9 +2,18 @@ import os
 from datetime import datetime
 import pandas as pd
 from pandas import DataFrame
-import json
+import logging
 import requests
 from dotenv import load_dotenv
+
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+file_handler = logging.FileHandler("logs/utils.log", encoding="utf-8")
+file_formatter = logging.Formatter("%(asctime)s - %(filename)s - %(levelname)s - %(message)s")
+file_handler.setFormatter(file_formatter)
+logger.addHandler(file_handler)
+
 
 load_dotenv()
 
@@ -28,6 +37,7 @@ def get_time_for_greeting():
 
 
 def get_date(date_time: str) -> list[str]:
+    """данные с начала месяца, на который выпадает входящая дата, по входящую дату"""
     dt = datetime.strptime(date_time, "%Y-%m-%d %H:%M:%S")
     start_of_month = datetime(dt.year, dt.month, 1)
     return [start_of_month.strftime("%d.%m.%Y %H:%M:%S"), dt.strftime("%d.%m.%Y %H:%M:%S")]
@@ -105,34 +115,43 @@ def get_top_transaction(sorted_df: DataFrame, get_top):
     return top_pay_transaction
 
 def get_currency(symbols):
+    """ Функция принимает символ от Excel файла и возвращает курс валюту """
     base = "RUB"
     url = f"https://api.apilayer.com/exchangerates_data/latest?symbols={symbols}&base={base}"
     headers = {"apikey": os.getenv("API_KEY")}
     response = requests.get(url, headers=headers, data={})
     result_cur = []
-    for k, v in response.json().get("rates").items():
-        result_cur.append({"currency": k, "rate": round(1/v, 2)})
-    return result_cur
-
-
-
+    try:
+        for k, v in response.json().get("rates").items():
+            result_cur.append({"currency": k, "rate": round(1/v, 2)})
+        return result_cur
+    except Exception as e:
+        logger.error(f"Произошла ошибка {e}")
+        print(e)
+        return []
 
 def get_stock(stocks: list) -> list[dict]:
+    """Функция принимает символ stocks от Excel файла и возвращает стоимость акций из S&P500."""
     stock_rates = []
-    for stock in stocks:
-        params = {
-            "symbol": f"{stock}",  "apikey": os.getenv("API_KEY_ALPHA_VINTAGE"), "function": "GLOBAL_QUOTE"
-        }
+    try:
+        for stock in stocks:
+            params = {
+                "symbol": f"{stock}",  "apikey": os.getenv("API_KEY_ALPHA_VINTAGE"), "function": "GLOBAL_QUOTE"
+            }
 
-        r = requests.get(url_stock, data={}, params=params)
-        status_code = r.status_code
-        if status_code == 200:
-            result = r.json()
-            if "Global Quote" in result:
-                stock_name = result["Global Quote"]["01. symbol"]
-                price = float(result["Global Quote"]["05. price"])
-                stock_rates.append({
-                    "stock": stock_name,
-                    "price": price
-                })
-    return stock_rates
+            r = requests.get(url_stock, data={}, params=params)
+            status_code = r.status_code
+            if status_code == 200:
+                result = r.json()
+                if "Global Quote" in result:
+                    stock_name = result["Global Quote"]["01. symbol"]
+                    price = float(result["Global Quote"]["05. price"])
+                    stock_rates.append({
+                        "stock": stock_name,
+                        "price": price
+                    })
+        return stock_rates
+    except Exception as e:
+        logger.error(f"Произошла ошибка {e}")
+        print(e)
+        return []

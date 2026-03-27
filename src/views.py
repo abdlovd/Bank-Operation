@@ -1,9 +1,18 @@
 import json
 
+import logging
 from config import JSON, EXCEL
 from main import open_json_file
 from src.utils import get_time_for_greeting, get_date, path_and_period, get_card_with_spend, get_top_transaction, \
     get_currency, get_stock
+
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+file_handler = logging.FileHandler("logs/utils.log", encoding="utf-8")
+file_formatter = logging.Formatter("%(asctime)s - %(filename)s - %(levelname)s - %(message)s")
+file_handler.setFormatter(file_formatter)
+logger.addHandler(file_handler)
 
 
 

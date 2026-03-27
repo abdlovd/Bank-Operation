@@ -1,5 +1,14 @@
 import pandas as pd
 import json
+import logging
+
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+file_handler = logging.FileHandler("logs/utils.log", encoding="utf-8")
+file_formatter = logging.Formatter("%(asctime)s - %(filename)s - %(levelname)s - %(message)s")
+file_handler.setFormatter(file_formatter)
+logger.addHandler(file_handler)
 
 
 def analyse_cashback(df: pd.DataFrame, year: int, month: int)-> str:

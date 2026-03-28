@@ -23,10 +23,12 @@ def analyse_cashback(df: pd.DataFrame, year: int, month: int)-> str:
         &
         (df["Сумма платежа"] < 0)
     ]
+    logging.info(f"Фильтрация операции по дате: {filtered_data}")
 
     expenses_by_category: pd.DataFrame = filtered_data.groupby("Категория")["Сумма платежа"].sum()
     cashback_by_category = abs(expenses_by_category) // 100
     dict_ = cashback_by_category.to_dict()
+    logging.info("Кэшбэк успешно рассчитан")
 
     json_file = json.dumps(dict_, ensure_ascii=False, indent=4)
 

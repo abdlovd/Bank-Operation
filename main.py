@@ -24,13 +24,12 @@ def open_json_file(path_to_json: str) -> tuple[list, list]:
             data = json.load(f)
             symbols = data["user_currencies"]
             stocks = data["user_stocks"]
+        logger.debug(f"Открыт файл по адресу {path_to_json}")
         return symbols, stocks
     except Exception as e:
         logger.error(f"Произошла ошибка {e}")
         print(e)
         return []
-
-# transaction: pd.DataFrame = pd.read_excel(EXCEL, sheet_name="Отчет по операциям")
 
 
 if __name__ == '__main__':

@@ -75,18 +75,23 @@ def get_card_with_spend(sorted_df: DataFrame) -> list[dict]:
         "Сумма операции",
         "Сумма операции с округлением"
     ]]
-    for index, row in card_sorted.iterrows():
-        if row["Сумма операции"] <= 0:
-            last_digit = str(row["Номер карты"]).replace("*", "")
-            total_spend = row["Сумма операции с округлением"]
-            cash_back = total_spend // 100
-            row = {
-                "last_digits": last_digit,
-                "total_spends": total_spend,
-                "cash_back": cash_back
-            }
-            card_spent_transaction.append(row)
-    return card_spent_transaction
+    try:
+        for index, row in card_sorted.iterrows():
+            if row["Сумма операции"] <= 0:
+                last_digit = str(row["Номер карты"]).replace("*", "")
+                total_spend = row["Сумма операции с округлением"]
+                cash_back = total_spend // 100
+                row = {
+                    "last_digits": last_digit,
+                    "total_spends": total_spend,
+                    "cash_back": cash_back
+                }
+                card_spent_transaction.append(row)
+        return card_spent_transaction
+    except Exception as e:
+        logger.error(f"Произошла ошибка {e}")
+        print(e)
+        return []
 
 
 def get_top_transaction(sorted_df: DataFrame, get_top):

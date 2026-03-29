@@ -1,11 +1,14 @@
+import os
+
 import pandas as pd
 import json
 import logging
 
+from config import root_dir
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
-file_handler = logging.FileHandler("logs/utils.log", encoding="utf-8")
+file_handler = logging.FileHandler(os.path.join(root_dir, "logs", "service.log"), encoding="utf-8")
 file_formatter = logging.Formatter("%(asctime)s - %(filename)s - %(levelname)s - %(message)s")
 file_handler.setFormatter(file_formatter)
 logger.addHandler(file_handler)

@@ -5,11 +5,11 @@ from pandas import DataFrame
 import logging
 import requests
 from dotenv import load_dotenv
-
+from config import root_dir
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
-file_handler = logging.FileHandler("logs/utils.log", encoding="utf-8")
+file_handler = logging.FileHandler(os.path.join(root_dir, "logs", "utils.log"), encoding="utf-8")
 file_formatter = logging.Formatter("%(asctime)s - %(filename)s - %(levelname)s - %(message)s")
 file_handler.setFormatter(file_formatter)
 logger.addHandler(file_handler)
@@ -25,7 +25,6 @@ def get_time_for_greeting():
     """ Функция возвращает зависимости от текущего
     времени определяет Приветственное сообщение"""
     time_now = datetime.now()
-    print(time_now)
     if 5 <= time_now.hour <= 12:
         return "Доброе утро"
     elif 12 <= time_now.hour <= 18:
@@ -90,7 +89,6 @@ def get_card_with_spend(sorted_df: DataFrame) -> list[dict]:
         return card_spent_transaction
     except Exception as e:
         logger.error(f"Произошла ошибка {e}")
-        print(e)
         return []
 
 
@@ -121,8 +119,9 @@ def get_top_transaction(sorted_df: DataFrame, get_top):
 
 def get_currency(symbols):
     """ Функция принимает символ от Excel файла и возвращает курс валюту """
+    symbol = ",".join(symbols)
     base = "RUB"
-    url = f"https://api.apilayer.com/exchangerates_data/latest?symbols={symbols}&base={base}"
+    url = f"https://api.apilayer.com/exchangerates_data/latest?symbols={symbol}&base={base}"
     headers = {"apikey": os.getenv("API_KEY")}
     response = requests.get(url, headers=headers, data={})
     result_cur = []
@@ -132,7 +131,6 @@ def get_currency(symbols):
         return result_cur
     except Exception as e:
         logger.error(f"Произошла ошибка {e}")
-        print(e)
         return []
 
 def get_stock(stocks: list) -> list[dict]:
@@ -158,5 +156,4 @@ def get_stock(stocks: list) -> list[dict]:
         return stock_rates
     except Exception as e:
         logger.error(f"Произошла ошибка {e}")
-        print(e)
         return []

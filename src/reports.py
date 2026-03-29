@@ -1,10 +1,13 @@
+import os
 from typing import Optional
 import logging
 import pandas as pd
 
+from config import root_dir
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
-file_handler = logging.FileHandler("logs/utils.log", encoding="utf-8")
+file_handler = logging.FileHandler(os.path.join(root_dir, "logs", "reports.log"), encoding="utf-8")
 file_formatter = logging.Formatter("%(asctime)s - %(filename)s - %(levelname)s - %(message)s")
 file_handler.setFormatter(file_formatter)
 logger.addHandler(file_handler)
@@ -24,7 +27,6 @@ def file_wrapper(arg: str="report.log"):
         return my_decorator
     except Exception as e:
         logger.error(f"Произошла ошибка {e}")
-        print(e)
         return []
 
 

@@ -25,6 +25,3 @@ def analyse_cashback(file_path: str, year: int, month: int)-> str:
     json_file = json.dumps(dict_, ensure_ascii=False, indent=4)
 
     return json_file
-
-
-

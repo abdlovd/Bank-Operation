@@ -49,5 +49,3 @@ def main_info(date_time:str)-> str:
     json_data = json.dumps(data, ensure_ascii=False, indent=4)
 
     return json_data
-
-
